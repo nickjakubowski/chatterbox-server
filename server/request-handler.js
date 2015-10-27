@@ -14,6 +14,7 @@ this file and include it in basic-server.js so that it actually works.
 
 var url = require('url');
 var http = require('http');
+var fs = require('fs')
 
 var storage = [];
 // POST requests are in format : {username: name, text: text, roomname: roomame}, doesn't expect anything
@@ -69,14 +70,23 @@ var requestHandler = function(request, response) {
     response.end();
   } else if (request.method === "GET") {
 
-    if (request.url !== '/classes/messages') {
-      response.writeHead(404, headers)
-      response.end();
-    }
+    // if (request.url !== '/classes/messages') {
+    //   response.writeHead(404, headers)
+    //   response.end();
+    // }
 
-    headers['Content-Type'] = "application/json";
-    response.writeHead(200, headers);
-    response.end('{"results" :' + JSON.stringify(storage) + '}');
+    if (request.url == '/') {
+      fs.readFile( __dirname + '../client/index', function(error, data) {
+        headers['Content-Type'] = "text/html";
+        response.writeHead(200, headers);
+        console.log(data);
+        response.end(data);
+      })
+    } else {
+      headers['Content-Type'] = "application/json";
+      response.writeHead(200, headers);
+      response.end('{"results" :' + JSON.stringify(storage) + '}');
+    }
 
   } else if (request.method === "POST") {
     response.writeHead(201, headers);
