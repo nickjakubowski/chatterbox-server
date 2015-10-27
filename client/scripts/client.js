@@ -1,7 +1,8 @@
 var app = {
   server : 'http://127.0.0.1:3000/classes/messages',
   rooms : [],
-  friends: []
+  friends: [],
+  myName: ""
 };
 
 app.init = function() {
@@ -17,8 +18,8 @@ app.init = function() {
 
 app.handleSubmit = function() {
   var message = {
-    username: location.search.split("=")[1] || "Laura",
-    text: $('#message').val(),
+    username: this.myName || "Laura",
+    message: $('#message').val(),
     roomname: document.getElementById('roomSelect').value || "roomname"
   };
   app.send(message);
@@ -51,8 +52,7 @@ app.fetch = function() {
     success: function (data) {
       app.clearMessages();
       _.each(data.results, function(obj) {
-        var parsed = JSON.parse(obj)
-        app.addMessage(parsed);
+        app.addMessage(obj);
       });
     },
     error: function (data) {
@@ -63,7 +63,7 @@ app.fetch = function() {
 
 app.addMessage = function(messageObj) {
   var username = app.escape(messageObj.username);
-  var message = app.escape(messageObj.text);
+  var message = app.escape(messageObj.message);
   var room = app.escape(messageObj.roomname);
 
   if (app.rooms.indexOf(room) === -1) {
@@ -71,11 +71,11 @@ app.addMessage = function(messageObj) {
   }
 
   if (document.getElementById('roomSelect').value === room || document.getElementById('roomSelect').value === "") {
-    $('#rendered_chats').append('<div class=\'chat ' + room + '\'><a class=\'username\'>' + username + ':</a> ' + message + '</div>');
-    $('#rendered_chats').children().last().find(".username").on('click', app.addFriend.bind(app, username));
+    $('#rendered_chats').prepend('<div class=\'chat ' + room + '\'><a class=\'username\'>' + username + ':</a> ' + message + '</div>');
+    $('#rendered_chats').children().first().find(".username").on('click', app.addFriend.bind(app, username));
 
     if(app.friends.indexOf(username) !== -1) {
-      $('#rendered_chats').children().last().addClass("friend");
+      $('#rendered_chats').children().first().addClass("friend");
     }
   }
 };
@@ -105,5 +105,6 @@ app.escape = function(str) {
 }
 
 $(document).ready(function() {
+  app.myName = prompt("What's your name?")
   app.init();
 })

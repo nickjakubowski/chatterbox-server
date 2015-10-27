@@ -12,10 +12,21 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
+var url = require('url');
+var http = require('http');
+
 var storage = [];
 // POST requests are in format : {username: name, text: text, roomname: roomame}, doesn't expect anything
 // GET reqests are in format: none, expect array of message objects
 var requestHandler = function(request, response) {
+
+  var options = {
+    host : '127.0.0.1:300'
+  }
+
+  var req = http.r
+
+
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -32,8 +43,6 @@ var requestHandler = function(request, response) {
   // console.logs in your code.
   console.log("Serving request type " + request.method + " for url " + request.url);
 
-  // The outgoing status.
-  var statusCode = 200;
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -47,7 +56,8 @@ var requestHandler = function(request, response) {
 
     // .writeHead() writes to the request line and headers of the response,
     // which includes the status and all headers.
-    response.writeHead(statusCode, headers);
+
+    response.writeHead(200, headers);
 
     // Make sure to always call response.end() - Node may not send
     // anything back to the client until you do. The string you pass to
@@ -58,8 +68,14 @@ var requestHandler = function(request, response) {
     // node to actually send all the data over to the client.
     response.end();
   } else if (request.method === "GET") {
+
+    if (request.url !== '/classes/messages') {
+      response.writeHead(404, headers)
+      response.end();
+    }
+
     headers['Content-Type'] = "application/json";
-    response.writeHead(statusCode, headers);
+    response.writeHead(200, headers);
     response.end('{"results" :' + JSON.stringify(storage) + '}');
 
   } else if (request.method === "POST") {
@@ -69,7 +85,8 @@ var requestHandler = function(request, response) {
         body+= data;
     });
     request.on('end', function(data) {
-      storage.push(body);
+      var parsed = JSON.parse(body);
+      storage.push(parsed);
       response.end(body);
     });
   }
