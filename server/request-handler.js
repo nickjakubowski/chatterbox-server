@@ -36,9 +36,9 @@ var requestHandler = function(request, response) {
   var statusCode = 200;
 
   // See the note below about CORS headers.
+  var headers = defaultCorsHeaders;
 
   if (request.method === "OPTIONS") {
-    var headers = defaultCorsHeaders;
     // Tell the client we are sending them plain text.
     //
     // You will need to change this if you are sending something
@@ -58,18 +58,20 @@ var requestHandler = function(request, response) {
     // node to actually send all the data over to the client.
     response.end();
   } else if (request.method === "GET") {
-    response.writeHead(statusCode, {'Content-Type' : 'application/JSON'})
+    headers['Content-Type'] = "application/json";
+    response.writeHead(statusCode, headers);
     response.end('{"results" :' + JSON.stringify(storage) + '}');
 
   } else if (request.method === "POST") {
-    console.log(request, "request")
-    console.log(request._postData, "DATA to be stored");
-    storage.push(request._postData);
-    response.writeHead(201);//{'Content-Type' : 'application/JSON'})
-    console.log(storage, "storage")
-    return response.end();
-    // response.end('{"results" :' + JSON.stringify(storage) + '}');
-
+    response.writeHead(201, headers);
+    var body = "";
+    request.on('data', function(data) {
+        body+= data;
+    });
+    request.on('end', function(data) {
+      storage.push(body);
+      response.end(body);
+    });
   }
 };
 
