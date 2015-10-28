@@ -21,13 +21,6 @@ var storage = [];
 // GET reqests are in format: none, expect array of message objects
 var requestHandler = function(request, response) {
 
-  var options = {
-    host : '127.0.0.1:300'
-  }
-
-  var req = http.r
-
-
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -73,16 +66,16 @@ var requestHandler = function(request, response) {
       response.writeHead(200, headers);
       response.end('{"results" :' + JSON.stringify(storage) + '}');
   } else if (request.method === "POST") {
-    response.writeHead(201, headers);
-    var body = "";
-    request.on('data', function(data) {
-        body+= data;
-    });
-    request.on('end', function(data) {
-      var parsed = JSON.parse(body);
-      storage.push(parsed);
-      response.end(body);
-    });
+      response.writeHead(201, headers);
+      var body = "";
+      request.on('data', function(data) {
+          body+= data;
+      });
+      request.on('end', function(data) {
+        var parsed = JSON.parse(body);
+        storage.push(parsed);
+        response.end(body);
+      });
   }
 };
 

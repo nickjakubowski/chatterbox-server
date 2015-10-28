@@ -1,7 +1,11 @@
-/* Import node's http module: */
+var headers = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "access-control-allow-headers": "content-type, accept",
+  "access-control-max-age": 10 // Seconds.
+};
+
 var http = require("http");
-var messages = require("./request-handler");
-// var url = require('url');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -28,7 +32,6 @@ app.use(function(req, res, next) {
   }
 });
 
-
 app.get('/classes/messages', function(req, res) {
   res.header('Content-type', 'application/json');
   res.status(200).send('{"results" :' + JSON.stringify(storage) + '}');
@@ -41,26 +44,9 @@ app.post('/classes/messages', function(req, res) {
   res.status(201).send("OK")
 });
 
+app.use(function(req, res) {
+  res.status(404).send("No file found")
+})
 
 console.log("Listening on http://" + ip + ":" + port);
 server.listen(port, ip);
-
-// To start this server, run:
-//
-//   node basic-server.js
-//
-// on the command line.
-//
-// To connect to the server, load http://127.0.0.1:3000 in your web
-// browser.
-//
-// server.listen() will continue running as long as there is the
-// possibility of serving more requests. To stop your server, hit
-// Ctrl-C on the command line.
-
-var headers = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "access-control-allow-headers": "content-type, accept",
-  "access-control-max-age": 10 // Seconds.
-};
